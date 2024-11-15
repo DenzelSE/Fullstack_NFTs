@@ -23,7 +23,7 @@ export default function Home() {
         const signer = provider.getSigner();
         const contract = new ethers.Contract(CONTRACT_ADDRESS, AvengersNftABI.abi, signer);
 
-        const tx = await contract.mint(1, { value: ethers.utils.parseEther("0.01") });
+        const tx = await contract.mint(1, { value: ethers.utils.parseEther("0.0002") });
         await tx.wait();
         alert("NFT Minted!");
       }
@@ -36,7 +36,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-black-900 text-white flex flex-col items-center justify-center">
-      <h1 className="text-4xl font-bold mb-6">Avengers NFT Minting</h1>
+      <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Avengers Assamble</h1>
       {account ? (
         <>
           <p className="mb-4">Connected Wallet: {account}</p>
