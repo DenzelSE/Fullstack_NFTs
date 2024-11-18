@@ -4,16 +4,17 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 
 contract AvengersNFT is ERC721Enumerable{
+
     uint256 public constant MAX_SUPPLY = 10;
-    uint256 public constant PRICE = 0.0004 ether;
+    uint256 public constant PRICE = 0.001 ether;
     uint256 public constant MAX_PER_WALLET = 5;
 
     string private _baseTokenURI;
 
     mapping(address => uint256) public walletMints;
 
-    constructor(string memory baseURI) ERC721("AvengersNFT", "AVN") {
-        _baseTokenURI = baseURI;
+    constructor() ERC721("AvengersNFT", "AVN") {
+        _baseTokenURI = "ipfs://QmTYWKogeU2MALmVaAUFFM8LjNdJs8PULQpiRsSyoCkag9/";
     }
 
     function mint(uint256 _amount) external payable {
