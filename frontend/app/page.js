@@ -23,7 +23,7 @@ export default function Home() {
         const signer = provider.getSigner();
         const contract = new ethers.Contract(CONTRACT_ADDRESS, AvengersNftABI.abi, signer);
 
-        const tx = await contract.mint(1, { value: ethers.utils.parseEther("0.0002") });
+        const tx = await contract.mint(1);
         await tx.wait();
         alert("NFT Minted!");
       }
