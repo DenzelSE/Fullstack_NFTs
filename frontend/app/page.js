@@ -629,41 +629,76 @@ export default function Home() {
   const [account, setAccount] = useState(null);
   const [web3, setWeb3] = useState(null);
   const [contract, setContract] = useState(null);
+  const [collection, setCollection] = useState([]);
+  const [ownedNFTs, setOwnedNFTs] = useState([]);
   const [minting, setMinting] = useState(false);
 
   useEffect(() => {
     if (window.ethereum) {
       const web3Instance = new Web3(window.ethereum);
       setWeb3(web3Instance);
+
+      const contractInstance = new web3Instance.eth.Contract(contractABIs, CONTRACT_ADDRESS);
+      setContract(contractInstance);
     }
   }, []);
 
   const connectWallet = async () => {
     if (window.ethereum) {
-      try {
-        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-        setAccount(accounts[0]);
+      const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+      setAccount(accounts[0]);
 
-        // Initialize contract instance
-        const contractInstance = new web3.eth.Contract(contractABIs , CONTRACT_ADDRESS);
-        setContract(contractInstance);
-      } catch (error) {
-        console.error("Error connecting wallet:", error);
-      }
+      fetchCollection();
+      fetchOwnedNFTs(accounts[0]);
     } else {
       alert("Please install MetaMask!");
     }
   };
 
-  const mint = async () => {
+  const fetchCollection = async () => {
+    if (!contract) return;
+
+    const collection = [];
+    const maxSupply = 10;
+
+    for (let tokenId = 1; tokenId <= maxSupply; tokenId++) {
+      try {
+        const tokenURI = await contract.methods.tokenURI(tokenId).call();
+        console.log(tokenURI);
+        collection.push({ tokenId, tokenURI });
+      } catch {
+        collection.push({ tokenId, tokenURI: null }); 
+      }
+    }
+    setCollection(collection);
+  };
+
+  const fetchOwnedNFTs = async (owner) => {
+    if (!contract) return;
+
+    const balance = await contract.methods.balanceOf(owner).call();
+    const owned = [];
+
+    for (let i = 0; i < balance; i++) {
+      const tokenId = await contract.methods.tokenOfOwnerByIndex(owner, i).call();
+      const tokenURI = await contract.methods.tokenURI(tokenId).call();
+      owned.push({ tokenId, tokenURI });
+    }
+
+    setOwnedNFTs(owned);
+  };
+
+  const mint = async (tokenId) => {
     if (!contract) return alert("Contract not initialized. Connect your wallet first.");
     try {
       setMinting(true);
-      const mintPrice = Web3.utils.toWei("0.0002", "ether");
-      await contract.methods
-        .mint(account, 1)
-        .send({ from: account, value: mintPrice });
-      alert("NFT Minted Successfully!");
+      const mintPrice = Web3.utils.toWei("0.002", "ether");
+
+      await contract.methods.mintSpecific(tokenId).send({ from: account, value: mintPrice });
+      alert(`NFT ${tokenId} Minted Successfully!`);
+      fetchCollection();
+      fetchOwnedNFTs(account);
+
     } catch (error) {
       console.error("Minting failed:", error);
       alert("Minting failed. See console for details.");
@@ -672,29 +707,80 @@ export default function Home() {
     }
   };
 
+  // const mint = async () => {
+  //   if (!contract) return alert("Contract not initialized. Connect your wallet first.");
+  //   try {
+  //     setMinting(true);
+  //     const mintPrice = Web3.utils.toWei("0.01", "ether");
+  //     await contract.methods
+  //       .mint(account,1)
+  //       .send({ from: account, value: mintPrice });
+  //     alert("NFT Minted Successfully!");
+  //   } catch (error) {
+  //     console.error("Minting failed:", error);
+  //     alert("Minting failed. See console for details.");
+  //   } finally {
+  //     setMinting(false);
+  //   }
+  // };
+
   return (
-    <div className="min-h-screen bg-avengers bg-cover bg-center bg-h-screen text-white flex flex-col items-center justify-center">
-      <h1 className="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Avengers Assamble</h1>
-      {account ? (
-        <>
-          <p className="mb-4">Connected Wallet: {account}</p>
-          <button
-            onClick={mint}
-            className={`px-4 py-2 bg-blue-500 rounded ${
-              minting ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            disabled={minting}
-          >
-            {minting ? "Minting..." : "Mint NFT"}
-          </button>
-        </>
-      ) : (
+        <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center">
+      <h1 className="text-4xl font-bold mt-6">Avengers NFT Minting</h1>
+
+      {!account ? (
         <button
           onClick={connectWallet}
-          className="px-4 py-2 bg-green-500 rounded"
+          className="mt-6 px-6 py-2 bg-green-500 rounded"
         >
           Connect Wallet
         </button>
+      ) : (
+        <>
+          <div className="mt-6">
+            <h2 className="text-2xl">Available Collection</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+              {collection.map((nft) => (
+                <div
+                  key={nft.tokenId}
+                  className="border border-gray-700 rounded p-2 flex flex-col items-center"
+                >
+                  {nft.tokenURI ? (
+                    <img src={nft.tokenURI} alt={`NFT ${nft.tokenId}`} className="w-32 h-32" />
+                  ) : (
+                    <div className="w-32 h-32 bg-gray-700 flex items-center justify-center">
+                      <p>Not Minted</p>
+                    </div>
+                  )}
+                  <button
+                    className={`mt-2 px-4 py-1 rounded ${
+                      nft.tokenURI ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500"
+                    }`}
+                    onClick={() => mint(nft.tokenId)}
+                    disabled={!!nft.tokenURI || minting}
+                  >
+                    {minting ? "Minting..." : "Mint"}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-12">
+            <h2 className="text-2xl">Your NFTs</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
+              {ownedNFTs.map((nft) => (
+                <div
+                  key={nft.tokenId}
+                  className="border border-gray-700 rounded p-2 flex flex-col items-center"
+                >
+                  <img src={nft.tokenURI} alt={`NFT ${nft.tokenId}`} className="w-32 h-32" />
+                  <p className="mt-2">NFT #{nft.tokenId}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
