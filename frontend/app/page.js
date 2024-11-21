@@ -664,7 +664,7 @@ export default function Home() {
     const collection = [];
     const maxSupply = 10;
 
-    for (let tokenId = 1; tokenId <= maxSupply; tokenId++) {
+    for (let tokenId = 0; tokenId <= maxSupply; tokenId++) {
       try {
         const tokenURI = await contract.methods.tokenURI(tokenId).call();
         console.log(tokenURI);
@@ -746,25 +746,12 @@ export default function Home() {
             {imageURI.map((url, index) => (
           <div 
             key={index} 
-            style={{ 
-              margin: '10px', 
-              position: 'relative', 
-              width: '220px', 
-              height: '220px', 
-              overflow: 'hidden' 
-            }}
           >
-    
                   {index ? (
                     <img 
                     src={url} 
                     alt={index} 
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'cover', 
-                      borderRadius: '15px' 
-                    }} 
+                    className="w-32 h-32"
                   />
                   ) : (
                     <div className="w-32 h-32 bg-gray-700 flex items-center justify-center">
@@ -775,8 +762,8 @@ export default function Home() {
                     className={`mt-2 px-4 py-1 rounded ${
                       index ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500"
                     }`}
-                    onClick={() => mint(index)}
-                    disabled={!!index || minting}
+                    onClick={() => mint(accounts[0],1)}
+                    // disabled={!!index || minting}
                   >
                     {minting ? "Minting..." : "Mint"}
                   </button>
