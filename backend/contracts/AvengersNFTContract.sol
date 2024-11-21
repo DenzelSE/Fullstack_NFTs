@@ -1235,7 +1235,7 @@ abstract contract Ownable is Context {
 
 pragma solidity ^0.8.0;
 
-contract MothoreFoundry is ERC721Enumerable, Ownable {
+contract ABC is ERC721Enumerable, Ownable {
     using Strings for uint256;
     string public baseURI;
     string public baseExtension = ".json";
@@ -1259,7 +1259,7 @@ contract MothoreFoundry is ERC721Enumerable, Ownable {
             require(supply + _mintAmount <= maxSupply);
             
             if (msg.sender != owner()) {
-            require(msg.value == cost * _mintAmount, "Need to send 0.003 ether!");
+            require(msg.value == cost * _mintAmount, "Need to send 0.08 ether!");
             }
             
             for (uint256 i = 1; i <= _mintAmount; i++) {
