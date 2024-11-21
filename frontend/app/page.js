@@ -633,6 +633,9 @@ export default function Home() {
   const [ownedNFTs, setOwnedNFTs] = useState([]);
   const [minting, setMinting] = useState(false);
 
+  const imageURL = "https://harlequin-used-sloth-165.mypinata.cloud/ipfs/QmSt8U7QE7tjr9rzrJwNKbtqjt9hcNpwzSA7hx9EEv6wuv/";
+  const imageURI = Array.from({length: 10}, (_, index) => `${imageURL}${index}.jpg`);
+
   useEffect(() => {
     if (window.ethereum) {
       const web3Instance = new Web3(window.ethereum);
@@ -740,13 +743,29 @@ export default function Home() {
           <div className="mt-6">
             <h2 className="text-2xl">Available Collection</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
-              {collection.map((nft) => (
-                <div
-                  key={nft.tokenId}
-                  className="border border-gray-700 rounded p-2 flex flex-col items-center"
-                >
-                  {nft.tokenURI ? (
-                    <img src={nft.tokenURI} alt={`NFT ${nft.tokenId}`} className="w-32 h-32" />
+            {imageURI.map((url, index) => (
+          <div 
+            key={index} 
+            style={{ 
+              margin: '10px', 
+              position: 'relative', 
+              width: '220px', 
+              height: '220px', 
+              overflow: 'hidden' 
+            }}
+          >
+    
+                  {index ? (
+                    <img 
+                    src={url} 
+                    alt={index} 
+                    style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      objectFit: 'cover', 
+                      borderRadius: '15px' 
+                    }} 
+                  />
                   ) : (
                     <div className="w-32 h-32 bg-gray-700 flex items-center justify-center">
                       <p>Not Minted</p>
@@ -754,10 +773,10 @@ export default function Home() {
                   )}
                   <button
                     className={`mt-2 px-4 py-1 rounded ${
-                      nft.tokenURI ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500"
+                      index ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500"
                     }`}
-                    onClick={() => mint(nft.tokenId)}
-                    disabled={!!nft.tokenURI || minting}
+                    onClick={() => mint(index)}
+                    disabled={!!index || minting}
                   >
                     {minting ? "Minting..." : "Mint"}
                   </button>
