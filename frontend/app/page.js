@@ -697,7 +697,7 @@ export default function Home() {
       setMinting(true);
       const mintPrice = Web3.utils.toWei("0.002", "ether");
 
-      await contract.methods.mintSpecific(tokenId).send({ from: account, value: mintPrice });
+      await contract.methods .mint(account,1).send({ from: account, value: mintPrice });
       alert(`NFT ${tokenId} Minted Successfully!`);
       fetchCollection();
       fetchOwnedNFTs(account);
@@ -760,10 +760,10 @@ export default function Home() {
                   )}
                   <button
                     className={`mt-2 px-4 py-1 rounded ${
-                      index ? "bg-gray-500 cursor-not-allowed" : "bg-blue-500"
+                      index ? "bg-gray-500 " : "bg-blue-500 cursor-not-allowed"
                     }`}
-                    onClick={() => mint(accounts[0],1)}
-                    // disabled={!!index || minting}
+                    onClick={() => mint(account,1)}
+                    disabled={!!index || minting}
                   >
                     {minting ? "Minting..." : "Mint"}
                   </button>
