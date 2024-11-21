@@ -728,8 +728,9 @@ export default function Home() {
   // };
 
   return (
-        <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center">
+        <div className="min-h-screen bg-[url('images/avengers_background.jpg')] bg-cover text-white flex flex-col items-center">
       <h1 className="text-4xl font-bold mt-6">Avengers NFT Minting</h1>
+    {/* refresh baba */}
 
       {!account ? (
         <button
