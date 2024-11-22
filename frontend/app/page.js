@@ -694,7 +694,7 @@ export default function Home() {
   const mint = async (tokenId) => {
     if (!contract) return alert("Contract not initialized. Connect your wallet first.");
     try {
-      setMinting(true);
+      // setMinting(true);
       const mintPrice = Web3.utils.toWei("0.002", "ether");
 
       await contract.methods .mint(account,1).send({ from: account, value: mintPrice });
@@ -761,7 +761,7 @@ export default function Home() {
                   )}
                   <button
                     className={`mt-2 px-4 py-1 rounded ${
-                      index ? "bg-gray-500 " : "bg-blue-500 cursor-not-allowed"
+                      index ? "bg-gray-500 " : "bg-blue-500"
                     }`}
                     onClick={() => mint(account,1)}
                     disabled={!!index || minting}
